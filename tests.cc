@@ -51,11 +51,27 @@ void acquire2Locks(int index1, int index2){
   }
 }
 
-void acquireAll(){
-  for(int i = 0; i < ACCNTS; i++){
-    while(!locks[i].try_lock());
+void releaseHelper(int i){
+  for(i;i>=0;i--){
+    locks[i].unlock();
   }
-  
+}
+
+void acquireAll(){
+  int i = 0;
+  while(i < ACCNTS && i >=0) {
+    if(locks[i].try_lock()){
+      //lock acquired
+      i++;
+      if(locks[i].try_lock()){
+	//next lock acquired
+      }else{
+	releaseHelper(i);
+      }
+    }else{
+      releaseHelper(i);
+    }
+  }
 }
 
 void releaseAll(){
